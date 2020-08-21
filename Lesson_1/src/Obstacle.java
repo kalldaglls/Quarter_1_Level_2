@@ -1,3 +1,6 @@
 public interface Obstacle {
-    void checkObstacle ();
+    //void doRun ();
+    //void doJump();
+    void checkObstacle (int metres);
+
 }
