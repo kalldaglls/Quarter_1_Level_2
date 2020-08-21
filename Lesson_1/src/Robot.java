@@ -42,4 +42,6 @@ public class Robot implements Info {
                 ", maxJump=" + maxJump +
                 '}';
     }
+
+
 }

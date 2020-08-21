@@ -56,7 +56,7 @@ public class Competition {
     }
 
     public static void testCompetition (Info [] competitor, Obstacle [] obstacle) {
-
+        obstacle[0].toString();
 
     }
 

@@ -11,8 +11,10 @@ public class Wall implements Obstacle {
     }
 
     @Override
-    public void checkObstacle(int wallHeight) {
-        this.wallHeight = wallHeight;
+    public void checkObstacle(String wallName) {
+                if (wallName.equals(this.wallName)) {
+                    System.out.println("Do jump!");
+                }
     }
 
     public String getWallName() {
