@@ -40,6 +40,7 @@ public class Competition {
         competitors1[2].showCompetitors();
 
          */
+        testCompetition(competitor,obstacles);
     }
 
     public static void makeCompetition (Info [] competitor, Obstacle [] obstacle) {
@@ -55,11 +56,16 @@ public class Competition {
         }
     }
 
-    public static void testCompetition (Info [] competitor, Obstacle [] obstacle) {
-        obstacle[0].toString();
+    public static void testCompetition (Info [] competitor, Obstacle [] obstacles) {
+        System.out.println("=============================");
+        System.out.println("=============================");
+        for (int i = 0; i < competitor.length; i++) {
+            for (int j = 0; j < obstacles.length; j++) {
+                obstacles[j].checkObstacle(obstacles[j].toString(), competitor[i].toString());
+            }
 
+        }
     }
-
 
     /*
     public static void doCompetition (Info [] competitors, Obstacle [] obstacle) {

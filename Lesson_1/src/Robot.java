@@ -43,5 +43,7 @@ public class Robot implements Info {
                 '}';
     }
 
-
+    public String getName() {
+        return name;
+    }
 }

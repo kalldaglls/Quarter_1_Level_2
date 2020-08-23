@@ -41,4 +41,8 @@ public class Cat implements Info {
                 ", maxJump=" + maxJump +
                 '}';
     }
+
+    public String getName() {
+        return name;
+    }
 }

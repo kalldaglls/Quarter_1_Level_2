@@ -56,4 +56,8 @@ public class Human implements Info {
     public int getMaxRunDistance() {
         return maxRunDistance;
     }
+
+    public String getName() {
+        return name;
+    }
 }

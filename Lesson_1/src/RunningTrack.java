@@ -3,8 +3,9 @@ public class RunningTrack implements Obstacle {
     String trackName;
 
     @Override
-    public void checkObstacle(String trackName) {
+    public void checkObstacle(String trackName, String name) {
         this.trackName = trackName;
+        System.out.println(name + " " + "passed the distance!" + " " + trackName);
 
     }
 
