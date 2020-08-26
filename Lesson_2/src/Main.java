@@ -46,7 +46,7 @@ public class Main {
                     //int newElement = Integer.parseInt(String.valueOf(newArray[i][j]));
                     //System.out.println(newElement);
                     if (newArray[i][j].contains("b")) {
-                        throw new MyArrayDataException("Can't parse due to String content");
+                        throw new MyArrayDataException("Can't parse due to String content" + i + " " + j);
                     }
                     int a = Integer.parseInt(newArray[i][j]);
                     sum = sum + a;
