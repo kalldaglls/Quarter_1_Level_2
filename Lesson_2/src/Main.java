@@ -24,41 +24,41 @@ public class Main {
 
          */
 
-        String [] [] arrayTwo = new String[][]{
-            {"2", "1", "4", "7"},
+        String [] [] arrayTwo = new String[][]{//Сначала пытался задать не строковый массив, а массив придуманного класса Array, но ника не удалось перевести его к int, даже к String не получилось. Как это можно сделать?
+            {"2", "1", "c", "7"},
             {"2", "1", "b", "7"},
             {"2", "1", "4", "7"},
             {"2", "1", "4", "7"}
         };
         try {
             System.out.println(checkArray(arrayTwo));
-        } catch (MyArraySizeException | MyArrayDataException e) {
+        } catch (MyArraySizeException e) {
             System.out.println();
             e.printStackTrace();
         }
 
     }
-    public static int checkArray(String [][] newArray) throws MyArraySizeException, MyArrayDataException {
+    public static int checkArray(String [][] newArray) throws MyArraySizeException{
         if (newArray.length == 4) {//Когда делаю array.length касательно двумерного массива, то что он выдает? Горизонталь? Вертикаль?
             int sum = 0;
             for (int i = 0; i < newArray.length; i++) {
                 for (int j = 0; j < newArray.length; j++) {
                     //int newElement = Integer.parseInt(String.valueOf(newArray[i][j]));
                     //System.out.println(newElement);
-                    if (newArray[i][j].contains("b")) {
-                        throw new MyArrayDataException("Can't parse due to String content" + i + " " + j);
+                    try {
+                        sum+= Integer.parseInt(newArray[i][j]);
+                    } catch (NumberFormatException e) {//Нельзя было обойтись без NumberFormatException?
+                        throw new MyArrayDataException("Can't parse due to String content " + "[" + i + "]" + "[" + j + "]");
                     }
-                    int a = Integer.parseInt(newArray[i][j]);
-                    sum = sum + a;
                     System.out.println(sum);
                 }
-                }
+            }
             return sum;
         } else {
             throw new MyArraySizeException("Wrong array size!");
+
         }
     }
-
 }
 /*1. Напишите метод, на вход которого подаётся двумерный строковый массив размером 4х4,
 при подаче массива другого размера необходимо бросить исключение MyArraySizeException.
