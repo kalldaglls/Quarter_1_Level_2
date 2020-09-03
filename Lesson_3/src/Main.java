@@ -12,17 +12,16 @@ public class Main {
 
         Set<String> uniqueWords = new HashSet<>();
         int a = 1;
-        for (int i = 0; i < words.length; i++) {
-            if (uniqueWords.contains(words[i])) {
-                System.out.printf("Element %s already exists in the list", words[i]);
+        for (String word : words) {
+            if (uniqueWords.contains(word)) {
+                System.out.printf("Element %s already exists in the list", word);
                 System.out.println();
                 a = a + 1;
                 System.out.println(a);
-                uniqueWords.add(words[i]);
-            }
-            else {
-                uniqueWords.add(words[i]);
-                System.out.println(words[i] + " " + 1);
+                uniqueWords.add(word);
+            } else {
+                uniqueWords.add(word);
+                System.out.println(word + " " + 1);
             }
         }
         System.out.println(uniqueWords);
@@ -38,6 +37,7 @@ public class Main {
             }
         }
         System.out.println(countWords);
+
     }
     }
 /*1. Создать массив с набором слов (10-20 слов, должны встречаться повторяющиеся).
