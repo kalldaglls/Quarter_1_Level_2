@@ -15,7 +15,7 @@ public class Main {
             }
             System.out.println();
         }
-        /*Array [] [] arrayTwo = new Array [4] [4]{
+        /*Array [] [] arrayTwo = new Array [4] [4]{//Сначала пытался задать не строковый массив, а массив придуманного класса Array, но ника не удалось перевести его к int, даже к String не получилось. Как это можно сделать?
                 {"2", "1", "4", "7"},
                 {"2", "1", "4", "7"},
                 {"2", "1", "4", "7"},
@@ -35,8 +35,14 @@ public class Main {
         } catch (MyArraySizeException e) {
             System.out.println();
             e.printStackTrace();
+        } finally {
+            System.out.println("Show the enD!");
+        }try {
+            System.out.println(array);
         }
-
+        finally{
+            System.out.println("NO END!!!");
+        }
     }
     public static int checkArray(String [][] newArray) throws MyArraySizeException{
         if (newArray.length == 4) {//Когда делаю array.length касательно двумерного массива, то что он выдает? Горизонталь? Вертикаль?
