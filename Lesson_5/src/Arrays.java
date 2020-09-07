@@ -5,6 +5,8 @@ public class Arrays {
     float [] a1 = new float[h];
     float [] a2 = new float[h];
 
+
+
     public void playArray (float[] arr) {
         java.util.Arrays.fill(arr, 1);
         long a = System.currentTimeMillis();
@@ -15,15 +17,14 @@ public class Arrays {
         System.out.println(System.currentTimeMillis() - a);
     }
 
-    public void playShortArray (float[] arr) {
+    public void playShortArray (float[] arr, float [] aMain) {
         java.util.Arrays.fill(arr, 1);
         long a = System.currentTimeMillis();
         //System.out.println(a);
         System.arraycopy(arr, 0, a1, 0, h);
         System.arraycopy(arr, h, a2, 0, h);
-        for (int i = 0; i < a1.length; i++) {
-            a1[i] = (float)(a1[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
-            a2[i] = (float)(a2[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
+        for (int i = 0; i < aMain.length; i++) {
+            aMain[i] = (float) (aMain[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
         }
         System.arraycopy(a1, 0, arr, 0, h);
         System.arraycopy(a2, 0, arr, h, h);
@@ -41,5 +42,13 @@ public class Arrays {
 
     public float[] getArr() {
         return arr;
+    }
+
+    public float[] getA1() {
+        return a1;
+    }
+
+    public float[] getA2() {
+        return a2;
     }
 }

@@ -14,7 +14,9 @@ public class Main {
         @Override
         public void run() {
             Arrays arrays1 = new Arrays();
-            arrays1.playShortArray(arrays1.getArr());
+            Arrays arrays2 = new Arrays();
+            arrays1.playShortArray(arrays1.getArr(),arrays1.getA1());
+            arrays2.playShortArray(arrays2.getArr(),arrays2.getA2());
 
         }
     }
