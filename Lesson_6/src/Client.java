@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    private  DataInputStream in;
+    private  DataInputStream inStream;
     private  DataOutputStream out;
     public static void main(String[] args) {
         new Client();
@@ -15,23 +15,23 @@ public class Client {
         try {
             Socket socket = new Socket("Localhost", 18443);
 
-            in = new DataInputStream(socket.getInputStream());
+            inStream = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            Scanner clientScanner = new Scanner(System.in);
+            //Scanner clientScanner = new Scanner(System.in);
 
             System.out.println("We are in client!");
             while (true) {
                 System.out.println("Client, please enter the message!");
-                out.writeUTF(clientScanner.nextLine());//Почему при написании out здесь работает, а уже при прописании в цикле ниже - нет?
-                String message  = in.readUTF();
+                out.writeUTF(String.valueOf(System.in));//Почему при написании out здесь работает, а уже при прописании в цикле ниже - нет?
+                String message  = inStream.readUTF();
                 System.out.println("Server: " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                in.close();
+                inStream.close();
                 out.close();
             } catch (IOException  | NullPointerException e) {
                 e.printStackTrace();
