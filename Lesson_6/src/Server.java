@@ -27,7 +27,7 @@ public class Server {
                 System.out.println(message);
                 System.out.println("Server, please write the message!");
                 out.writeUTF(serverScanner.nextLine());
-                System.out.println("Want you write another message?");
+                //System.out.println("Want you write another message?");
                 /*while (serverScanner.nextLine().equals("yes")) {
                     System.out.println("Enter another message!");
                     out.writeUTF(serverScanner.nextLine());

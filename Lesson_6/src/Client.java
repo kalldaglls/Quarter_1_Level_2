@@ -19,9 +19,9 @@ public class Client {
             Scanner clientScanner = new Scanner(System.in);
 
             System.out.println("Client, please enter the message!");
-            out.writeUTF(clientScanner.nextLine());//Почему при написании out здесь работает, а уже при прописании в цикле ниже - нет?
+            System.out.println("We are in client!");
             while (true) {
-                System.out.println("We are in client!");
+                out.writeUTF(clientScanner.nextLine());//Почему при написании out здесь работает, а уже при прописании в цикле ниже - нет?
                 String message  = in.readUTF();
                 System.out.println(message);
             }
