@@ -23,7 +23,7 @@ public class Client {
             System.out.println("We are in client!");
             while (true) {
                 System.out.println("Client, please enter the message!");
-                out.writeUTF(String.valueOf(System.in));//Почему при написании out здесь работает, а уже при прописании в цикле ниже - нет?
+                out.writeUTF(String.valueOf(System.in));
                 String message  = inStream.readUTF();
                 System.out.println("Server: " + message);
             }
