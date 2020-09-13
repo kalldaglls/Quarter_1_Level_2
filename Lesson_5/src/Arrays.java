@@ -10,6 +10,8 @@ public class Arrays{
     public Arrays() {
     }
 
+
+
     public void playArray () {
         java.util.Arrays.fill(arr, 1);
         long a = System.currentTimeMillis();
