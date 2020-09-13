@@ -27,6 +27,7 @@ public class Server {
 
             while (true) {
                 String message = in.readUTF();
+                Thread.sleep(5000);
                 System.out.println("Client: " + message);
                 System.out.println("Server, please write the message!");
                 out.writeUTF(serverScanner.nextLine());
@@ -38,7 +39,7 @@ public class Server {
 
                  */
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             try {

@@ -1,6 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -15,6 +13,7 @@ public class Client {
         try {
             Socket socket = new Socket("Localhost", 18443);
 
+            BufferedReader consoleReader =new BufferedReader(new InputStreamReader(System.in));
             inStream = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
@@ -23,11 +22,13 @@ public class Client {
             System.out.println("We are in client!");
             while (true) {
                 System.out.println("Client, please enter the message!");
-                out.writeUTF(String.valueOf(System.in));
+                String coolChat = consoleReader.readLine();
+                out.writeUTF(coolChat);
                 String message  = inStream.readUTF();
+                Thread.sleep(5000);
                 System.out.println("Server: " + message);
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             try {
