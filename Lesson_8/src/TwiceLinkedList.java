@@ -1,32 +1,43 @@
 public class TwiceLinkedList implements GeekbrainsList {
-    private Node head;
+    private Node head;//может добавить tail?
 
     @Override
     public void add(String o) {
         if (head == null) {
-            head = new Node(o);//Может {null,o,ссылка}? Или {null,o,null}?
+            head = new Node(null,o,null);//Должно быть именно {null,o,null}
             return;
         }
 
-        addLast(head, o);// Разобраться, что здесь писать!!!!Может не пихать здесь head?
+        //head.setNext(new Node(head.getPrevious(), o, null));
+       add(head, o);// Разобраться, что здесь писать!!!!Может не пихать здесь head?
     }
 
-    private void addLast (Node current,String o) {
-        if (current.getNext() == current.getPrevious()) {
-            current.setNext(new Node(o,current.getPrevious()));//переделать на {previous,o}. И проверить, чо вообще делает данный метод?
+
+    private void add(Node current, String o) {
+        if (current.getNext() == null) {//Как работает эта проверка?
+            Node next = new Node(o);
+            current.setNext(next);
+            next.setPrevious(current);
+           // current.setNext(new Node(current.previous,o));
             return;
         }
-        addLast(current.getNext(), o);
+        add(current.getNext(), o);
     }
 
-
-    private void add(Node previous, Node current, String o) {//равен методу выше?
-        if (current == previous) {
-            current.setNext(new Node(current.getPrevious(),o));
+    /*
+    private void add(Node current, String o, Node next, Node previous) {
+        if (current.getNext() == null) {
+            current.setNext(new Node(previous);
             return;
         }
-        add(current.getPrevious(), current, o);//{prev,o,next}
+        add(,o, new Node(o));//{prev,o,next}
     }
+
+     */
+
+
+
+
 
     @Override
     public void remove(String o) {
@@ -34,7 +45,9 @@ public class TwiceLinkedList implements GeekbrainsList {
             return;
         } else {
             if (head.getVal().equals(o)) {
+                Node previous = head.getPrevious();
                 head = head.getNext();
+                head.setPrevious(previous);
                 return;
             }
         }
@@ -42,15 +55,17 @@ public class TwiceLinkedList implements GeekbrainsList {
         remove(head, head.getNext(), o);
     }
 
-    private void remove(Node prev, Node current, String o) {
+    private void remove(Node previous, Node current, String o) {
         if (current == null) {
             return;
         }
 
-        if (current.getVal().equals(o)) {
-            prev.setNext(current.getNext());
-            return;
+        Node next = current.getNext();
+        previous.setNext(next);
+        if (next != null) {
+            next.setPrevious(previous);
         }
+
 
         remove(current, current.getNext(), o);
     }
@@ -61,7 +76,7 @@ public class TwiceLinkedList implements GeekbrainsList {
         private Node previous;
 
         public Node(String val) {
-            this(val, (Node) null);
+            this(val, (Node) null );
         }
 
         public Node(String val, Node next) {
@@ -74,14 +89,12 @@ public class TwiceLinkedList implements GeekbrainsList {
             this.previous = previous;
         }
 
-        public Node(String val, Node previous, Node next) {
+        public Node(Node previous, String val, Node next) {
             this.val = val;
             this.next = next;
             this.previous = previous;
         }
 
-        public Node(String val, String o) {
-        }
 
         public String getVal() {
             return val;
@@ -91,8 +104,9 @@ public class TwiceLinkedList implements GeekbrainsList {
             return next;
         }
 
-        public void setNext(Node next) {
+        public Node setNext(Node next) {
             this.next = next;
+            return next;
         }
 
         public Node getPrevious() {
@@ -103,12 +117,14 @@ public class TwiceLinkedList implements GeekbrainsList {
             this.previous = previous;
         }
 
+
+
         @Override
         public String toString() {
             return "Node{" +
-                    "val='" + val + '\'' +
+                    "previous=" + ((previous != null) ? previous.getVal() : null) +
+                    ", val='" + val + '\'' +
                     ", next=" + next +
-                    ", previous=" + previous +
                     '}';
         }
     }
