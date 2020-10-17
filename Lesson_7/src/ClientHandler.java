@@ -1,6 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeoutException;
@@ -52,7 +50,7 @@ public class ClientHandler {
             Thread firstThread = new Thread(new Runnable() {
 
                 @Override
-                public void run() {
+                public synchronized void run() {
                     String loginInfo;
                     try {
                         loginInfo = in.readUTF();
@@ -65,7 +63,7 @@ public class ClientHandler {
             Thread secondThread = new Thread(new Runnable() {
 
                 @Override
-                public void run() {
+                public synchronized void run() {
                     try {
                         Thread.sleep(120000);
                        // if (in.readUTF().isBlank()) {
@@ -140,6 +138,13 @@ public class ClientHandler {
             String message = in.readUTF();
             String formatterMessage = String.format("Message from %s: %s", name, message);
             System.out.println(formatterMessage);
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
+                bw.newLine();
+                bw.append(formatterMessage);
+            } catch (IOException e) {
+
+                throw new RuntimeException("SWW",e);
+            }
             if (message.equalsIgnoreCase("-exit")) {
                 return;
             }

@@ -21,8 +21,8 @@ public class Client {
 
             System.out.println("We are in client!");
             while (true) {
-                System.out.println("Client, please enter the message!");
                 String coolChat = consoleReader.readLine();
+                System.out.println("Client, please enter the message!");
                 out.writeUTF(coolChat);
                 String message  = inStream.readUTF();
                 Thread.sleep(5000);
