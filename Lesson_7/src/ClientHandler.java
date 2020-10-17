@@ -12,12 +12,14 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private Server server;
+    private BufferedReader consoleReader;
 
     public ClientHandler(Socket socket, Server server) {
         this.socket = socket;
         try {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            consoleReader = new BufferedReader(new InputStreamReader(System.in));
             start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -138,6 +140,7 @@ public class ClientHandler {
             String message = in.readUTF();
             String formatterMessage = String.format("Message from %s: %s", name, message);
             System.out.println(formatterMessage);
+            /*
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
                 bw.newLine();
                 bw.append(formatterMessage);
@@ -148,6 +151,7 @@ public class ClientHandler {
             if (message.equalsIgnoreCase("-exit")) {
                 return;
             }
+             */
             server.broadcast(formatterMessage);
         }
     }
@@ -155,6 +159,18 @@ public class ClientHandler {
     public void sendMessage(String message) {
         try {
             out.writeUTF(message);
+            System.out.println("Client, please enter the message!");
+            while (true) {
+                String coolChat = consoleReader.readLine();
+                out.writeUTF(coolChat);
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
+                    bw.newLine();
+                    bw.append(coolChat);
+                } catch (IOException e) {
+
+                    throw new RuntimeException("SWW",e);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
