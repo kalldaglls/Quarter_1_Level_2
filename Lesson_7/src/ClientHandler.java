@@ -37,6 +37,7 @@ public class ClientHandler {
             public void run() {
                 try {
                     authenticate();
+                    //writeHistory();
                     readMessage();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -140,7 +141,7 @@ public class ClientHandler {
             String message = in.readUTF();
             String formatterMessage = String.format("Message from %s: %s", name, message);
             System.out.println(formatterMessage);
-            /*
+
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
                 bw.newLine();
                 bw.append(formatterMessage);
@@ -151,8 +152,23 @@ public class ClientHandler {
             if (message.equalsIgnoreCase("-exit")) {
                 return;
             }
-             */
+
             server.broadcast(formatterMessage);
+        }
+    }
+
+    public void writeHistory () {
+        while (true) {
+            System.out.println("Client, please enter the message!");
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
+                String coolChat = consoleReader.readLine();
+                out.writeUTF(coolChat);
+                bw.newLine();
+                bw.append(coolChat);
+                return;
+            } catch (IOException e) {
+                throw new RuntimeException("SWW",e);
+            }
         }
     }
 
