@@ -40,7 +40,7 @@ public class Server {
         }
 
 
-    public void broadcast(String incomingMessage) {
+    public void broadcast(String incomingMessage) throws IOException {
         for (ClientHandler ch : clientHandlers) {
             ch.sendMessage(incomingMessage);
         }

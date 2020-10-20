@@ -19,7 +19,7 @@ public class ClientHandler {
         try {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            consoleReader = new BufferedReader(new InputStreamReader(System.in));
+            this.consoleReader = new BufferedReader(new InputStreamReader(System.in));
             start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,12 +37,17 @@ public class ClientHandler {
             public void run() {
                 try {
                     authenticate();
-                    //writeHistory();
+                    showHistory();
+                    writeToHistory();
                     readMessage();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    closeConnection();
+                    try {
+                        closeConnection();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();
@@ -50,7 +55,24 @@ public class ClientHandler {
 
     public void authenticate()  {
         System.out.println("Client auth is on going...");
-            Thread firstThread = new Thread(new Runnable() {
+        Thread secondThread = new Thread(new Runnable() {
+
+            @Override
+            public synchronized void run() {
+                try {
+                    Thread.sleep(20000);
+                    // if (in.readUTF().isBlank()) {
+                    closeConnection();
+                    socket.close();
+                    //}
+                    System.out.println("Client couldn't authorize in time!");
+                } catch (InterruptedException | IOException e) {
+                    throw new RuntimeException(Thread.currentThread() + " " + " is dead!");
+                }
+
+            }
+        });
+        Thread firstThread = new Thread(new Runnable() {
 
                 @Override
                 public synchronized void run() {
@@ -58,26 +80,10 @@ public class ClientHandler {
                     try {
                         loginInfo = in.readUTF();
                         checkAuth(loginInfo);
+                        secondThread.interrupt();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            });
-            Thread secondThread = new Thread(new Runnable() {
-
-                @Override
-                public synchronized void run() {
-                    try {
-                        Thread.sleep(120000);
-                       // if (in.readUTF().isBlank()) {
-                            closeConnection();
-                            socket.close();
-                        //}
-                        System.out.println("Client couldn't authorize in time!");
-                    } catch (InterruptedException | IOException e) {
-                        e.printStackTrace();
-                    }
-
                 }
             });
             firstThread.start();
@@ -116,7 +122,7 @@ public class ClientHandler {
 
 
 
-    public void closeConnection() {
+    public void closeConnection() throws IOException {
         server.unsubscribe(this);
         server.broadcast(String.format("%s left", name));
         try {
@@ -141,7 +147,7 @@ public class ClientHandler {
             String message = in.readUTF();
             String formatterMessage = String.format("Message from %s: %s", name, message);
             System.out.println(formatterMessage);
-
+            /*
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
                 bw.newLine();
                 bw.append(formatterMessage);
@@ -153,30 +159,47 @@ public class ClientHandler {
                 return;
             }
 
+             */
+
             server.broadcast(formatterMessage);
         }
     }
 
-    public void writeHistory () {
+    public void writeToHistory () {
         while (true) {
             System.out.println("Client, please enter the message!");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
                 String coolChat = consoleReader.readLine();
-                out.writeUTF(coolChat);
-                bw.newLine();
-                bw.append(coolChat);
-                return;
+                    // out.writeUTF(coolChat);
+                if (!coolChat.equals("-exit")) {
+                    bw.newLine();
+                    bw.append(coolChat);//return;
+                }
+                else break;
             } catch (IOException e) {
                 throw new RuntimeException("SWW",e);
             }
         }
     }
 
-    public void sendMessage(String message) {
-        try {
+    public void showHistory() {
+        try (BufferedReader br = new BufferedReader(new FileReader("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt"))) {
+            String str;
+            int i = 1;
+            while ((str = br.readLine()) != null && i <= 100) {
+                System.out.println(str);
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessage(String message) throws IOException {
             out.writeUTF(message);
-            System.out.println("Client, please enter the message!");
-            while (true) {
+            //System.out.println("Client, please enter the message!");
+            //while (true) {
+        /*
                 String coolChat = consoleReader.readLine();
                 out.writeUTF(coolChat);
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
@@ -186,15 +209,13 @@ public class ClientHandler {
 
                     throw new RuntimeException("SWW",e);
                 }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+         */
     }
 
-    public void checkAuth (String loginInfo) {
+    public void checkAuth (String loginInfo) throws IOException {
         while (true) {
             if (loginInfo.startsWith("-auth")) {
+                System.out.println("We are in checkAuth 1");
                 // -auth l1 p1
                 String[] splittedLoginInfo = loginInfo.split("\\s");
                 AuthenticationService.Client maybeClient = server.getAuthenticationService()
@@ -204,11 +225,16 @@ public class ClientHandler {
                         );
                 if (maybeClient != null) {
                     if (!server.checkLogin(maybeClient.getName())) {
+                        System.out.println("We are in checkAuth 2");
                         sendMessage("status: authok");
+                        sendMessage("We've done it!!!");
                         name = maybeClient.getName();
+                        System.out.println("We are in checkAuth 3");
                         server.broadcast(String.format("%s came in", name));
                         System.out.println("Client auth completed");
+                        System.out.println("We are in checkAuth 4");
                         server.subscribe(this);
+                        System.out.println("We are in checkAuth 5");
                         return;
                     } else {
                         sendMessage(String.format("%s already logged in", maybeClient.getName()));
