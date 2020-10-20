@@ -228,6 +228,7 @@ public class ClientHandler {
                         System.out.println("We are in checkAuth 2");
                         sendMessage("status: authok");
                         sendMessage("We've done it!!!");
+                        //showHistory();
                         name = maybeClient.getName();
                         System.out.println("We are in checkAuth 3");
                         server.broadcast(String.format("%s came in", name));
