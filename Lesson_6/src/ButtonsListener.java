@@ -1,27 +1,30 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class ButtonsListener implements ActionListener {
-   // private final JButton sendButton;
     private final JTextField inputField;
     private final JTextArea chatTextArea;
     public final StringBuilder sb = new StringBuilder();
+    private final Client client;
 
-    public ButtonsListener(JTextField inputField, JTextArea chatTextArea) {
-        //this.sendButton = sendButton;
+    public ButtonsListener(JTextField inputField, JTextArea chatTextArea, Client client) {
         this.inputField = inputField;
         this.chatTextArea = chatTextArea;
+        this.client = client;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        //JButton jButton = (JButton) e.getSource();
-        sb.append(inputField.getText());
-        String search = sb.toString();
-        chatTextArea.append(" " + search + "\n");
-        //chatTextArea.setText(search + "\n");
-        sb.setLength(0);
-        inputField.setText("");
+                    String message = inputField.getText();
+                    if (!message.trim().isBlank()) {
+                        try {
+                            client.getOut().writeUTF(message);
+                            inputField.setText("");
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    }
     }
 }

@@ -1,8 +1,32 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.List;
 
 public class ChatForm extends JFrame {
+    private final JTextField inputTextField;
+    private final JTextArea chatTextArea;
+    private Client client;
+
+    public static void main(String[] args) {
+        new ChatForm("YOTA");
+    }
+
+//    public ChatForm(JTextField inputTextField, JTextArea chatTextArea) throws HeadlessException {
+//        this.inputTextField = inputTextField;
+//        this.chatTextArea = chatTextArea;
+//    }
+//
+//    public JTextField getInputTextField() {
+//        return inputTextField;
+//    }
+
     public ChatForm(String title) {
+        chatTextArea = new JTextArea();
+        client = new Client(chatTextArea);
+
         setTitle(title);
         setBounds(new Rectangle(0,0,300,500));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -14,22 +38,35 @@ public class ChatForm extends JFrame {
         JPanel bottomPanel = new JPanel();
         mainScreen.setLayout(new BorderLayout());
         bottomPanel.setLayout(new GridLayout(1,1));
-        //bottomPanel.setLayout(new GridLayout(1,1));
 
-        JTextArea chatTextArea = new JTextArea();
-        //chatTextArea.setPreferredSize(new Dimension(300, 250));
-        //chatTextArea.setLayout(new BorderLayout());
+        //JTextArea chatTextArea = new JTextArea();
+
         chatTextArea.setEditable(false);
         mainScreen.add(chatTextArea, BorderLayout.CENTER);
 
-        var inputTextField = new JTextField();
+        inputTextField = new JTextField();
         bottomPanel.add(inputTextField);
 
         JButton sendButton = new JButton("Send");
-        //sendButton.setPreferredSize(new Dimension(80, 30));
+
         bottomPanel.add(sendButton);
 
-        ButtonsListener buttonsListener = new ButtonsListener(inputTextField, chatTextArea);
+//        sendButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String message = inputTextField.getText();
+//                if (!message.trim().isBlank()) {
+//                    try {
+//                        client.getOut().writeUTF(message);
+//                        inputTextField.setText("");
+//                    } catch (IOException ioException) {
+//                        ioException.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+
+        ButtonsListener buttonsListener = new ButtonsListener(inputTextField, chatTextArea, client);
 
         sendButton.addActionListener(buttonsListener);
 

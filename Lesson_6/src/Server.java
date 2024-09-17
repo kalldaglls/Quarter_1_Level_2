@@ -22,35 +22,22 @@ public class Server {
             Socket socket = serverSocket.accept();//хоть клиент на другой стороне, но мы через это должны с ним коммуницировать
             //этот тот же экземпляр(про socket), что и в клиенте, потому что мы его создаем на уровне сервера "аксептируя" приходящего клиента!
             //сверху как будто сканнер некст что-то или actionListener!
-            System.out.println(socket + " - client connected");
+            //System.out.println(socket + " - client connected");
 
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-
-            Scanner serverScanner = new Scanner(System.in);
-
             while (true) {
                 String message = in.readUTF();//читаем UTF потому что знаем, что нам на вход придет строка!
-                Thread.sleep(1500);
-                System.out.println("Client: " + message);
-                System.out.println("Server, please write the message!");
-                out.writeUTF(serverScanner.nextLine());//Работает как sout?
-                //System.out.println("Want you write another message?");
-                /*while (serverScanner.nextLine().equals("yes")) {
-                    System.out.println("Enter another message!");
-                    out.writeUTF(serverScanner.nextLine());
-                }
-
-                 */
+                out.writeUTF("Echo:" + message);//Работает как sout?
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                in.close();
-                out.close();
-            } catch (IOException  | NullPointerException e) {
+                //in.close();
+                //out.close();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

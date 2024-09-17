@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -5,40 +6,65 @@ import java.util.Scanner;
 public class Client {
     private  DataInputStream inStream;
     private  DataOutputStream out;
+    //private final JTextField inputField;
+    private JTextArea chatArea;
+
     public static void main(String[] args) {
         new Client();
     }
 
-    public Client () {
+    public Client() {}
+
+    public DataOutputStream getOut() {
+        return out;
+    }
+
+    public DataInputStream getInStream() {
+        return inStream;
+    }
+
+    public Client (JTextArea chatArea) {
+        this.chatArea = chatArea;
         try {
+            //Thread.sleep(3000);
             Socket socket = new Socket("Localhost", 18443);
 
-            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
+            //BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
             inStream = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            //Scanner clientScanner = new Scanner(System.in);
-
-            System.out.println("We are in client!");
+            //System.out.println("We are in client!");
             //ждут от друг друга сообщения, а до этого не могут отправить свое?
-            while (true) {
-                System.out.println("Client, please enter the message!");
-                String coolChat = consoleReader.readLine();
-                out.writeUTF(coolChat);
-                String message  = inStream.readUTF();
-                if(message.equals("STOP")) {
-                    break;
+//            while (true) {
+//                String coolChat = inputField.getText();
+//                out.writeUTF(coolChat);
+//                String message  = inStream.readUTF();
+//                if(message.equals("STOP")) {
+//                    break;
+//                }
+//            }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        while (true) {
+                            String message = inStream.readUTF();
+                            chatArea.append(message + "\n");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                Thread.sleep(1500);
-                System.out.println("Server: " + message);
-            }
-        } catch (IOException | InterruptedException e) {
+            }).start();
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                inStream.close();
-                out.close();
-            } catch (IOException  | NullPointerException e) {
+
+                //inStream.close();
+                //out.close();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
