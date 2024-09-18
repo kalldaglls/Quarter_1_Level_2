@@ -1,9 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.List;
 
 public class ChatForm extends JFrame {
     private final JTextField inputTextField;
@@ -13,15 +9,6 @@ public class ChatForm extends JFrame {
     public static void main(String[] args) {
         new ChatForm("YOTA");
     }
-
-//    public ChatForm(JTextField inputTextField, JTextArea chatTextArea) throws HeadlessException {
-//        this.inputTextField = inputTextField;
-//        this.chatTextArea = chatTextArea;
-//    }
-//
-//    public JTextField getInputTextField() {
-//        return inputTextField;
-//    }
 
     public ChatForm(String title) {
         chatTextArea = new JTextArea();
@@ -39,8 +26,6 @@ public class ChatForm extends JFrame {
         mainScreen.setLayout(new BorderLayout());
         bottomPanel.setLayout(new GridLayout(1,1));
 
-        //JTextArea chatTextArea = new JTextArea();
-
         chatTextArea.setEditable(false);
         mainScreen.add(chatTextArea, BorderLayout.CENTER);
 
@@ -51,22 +36,7 @@ public class ChatForm extends JFrame {
 
         bottomPanel.add(sendButton);
 
-//        sendButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String message = inputTextField.getText();
-//                if (!message.trim().isBlank()) {
-//                    try {
-//                        client.getOut().writeUTF(message);
-//                        inputTextField.setText("");
-//                    } catch (IOException ioException) {
-//                        ioException.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-
-        ButtonsListener buttonsListener = new ButtonsListener(inputTextField, chatTextArea, client);
+        ButtonsListener buttonsListener = new ButtonsListener(inputTextField, client);
 
         sendButton.addActionListener(buttonsListener);
 

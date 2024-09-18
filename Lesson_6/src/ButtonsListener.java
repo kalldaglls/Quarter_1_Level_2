@@ -5,13 +5,10 @@ import java.io.IOException;
 
 public class ButtonsListener implements ActionListener {
     private final JTextField inputField;
-    private final JTextArea chatTextArea;
-    public final StringBuilder sb = new StringBuilder();
     private final Client client;
 
-    public ButtonsListener(JTextField inputField, JTextArea chatTextArea, Client client) {
+    public ButtonsListener(JTextField inputField, Client client) {
         this.inputField = inputField;
-        this.chatTextArea = chatTextArea;
         this.client = client;
     }
 
@@ -26,5 +23,19 @@ public class ButtonsListener implements ActionListener {
                             ioException.printStackTrace();
                         }
                     }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        String message = client.getInStream().readUTF();
+                        System.out.println(message);
+                        SwingUtilities.invokeLater(() -> client.getChatArea().append(message + "\n"));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
