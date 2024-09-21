@@ -10,7 +10,7 @@ public class ClientApplicationOne {
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
-            out.writeUTF("-auth l1 p1 ");
+            out.writeUTF("-auth l1 p1 u1");
             new Thread(new Runnable() {
                 @Override
                 public void run() {

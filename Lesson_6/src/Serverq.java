@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Server {
+public class Serverq {
     private DataInputStream in;
     private DataOutputStream out;
 
@@ -13,7 +13,7 @@ public class Server {
         new Server();
     }
 
-    public Server(){
+    public Serverq(){
         try {
             ServerSocket serverSocket = new ServerSocket(18443);
 

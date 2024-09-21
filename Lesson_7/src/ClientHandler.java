@@ -168,7 +168,7 @@ public class ClientHandler {
     public void writeToHistory () {
         while (true) {
             System.out.println("Client, please enter the message!");
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("Lesson_7/Local_History.txt", true))) {
                 String coolChat = consoleReader.readLine();
                     // out.writeUTF(coolChat);
                 if (!coolChat.equals("-exit")) {
@@ -183,7 +183,7 @@ public class ClientHandler {
     }
 
     public void showHistory() {
-        try (BufferedReader br = new BufferedReader(new FileReader("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("Lesson_7/Local_History.txt"))) {
             String str;
             int i = 1;
             while ((str = br.readLine()) != null && i <= 100) {
