@@ -55,39 +55,38 @@ public class ClientHandler {
 
     public void authenticate()  {
         System.out.println("Client auth is on going...");
+        Thread firstThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                String loginInfo;
+                try {
+                    loginInfo = in.readUTF();
+                    checkAuth(loginInfo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         Thread secondThread = new Thread(new Runnable() {
 
             @Override
-            public synchronized void run() {
+            public void run() {
                 try {
-                    Thread.sleep(20000);
+                    Thread.sleep(120000);
                     // if (in.readUTF().isBlank()) {
                     closeConnection();
                     socket.close();
                     //}
                     System.out.println("Client couldn't authorize in time!");
                 } catch (InterruptedException | IOException e) {
-                    throw new RuntimeException(Thread.currentThread() + " " + " is dead!");
+                    e.printStackTrace();
                 }
 
             }
         });
-        Thread firstThread = new Thread(new Runnable() {
-
-                @Override
-                public synchronized void run() {
-                    String loginInfo;
-                    try {
-                        loginInfo = in.readUTF();
-                        checkAuth(loginInfo);
-                        secondThread.interrupt();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            firstThread.start();
-            secondThread.start();
+        firstThread.start();
+        secondThread.start();
 
         try {
             firstThread.join();
@@ -95,7 +94,8 @@ public class ClientHandler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        }
+    }
+
 
 
         /*Thread firstThread = new Thread(new Runnable() {
@@ -165,22 +165,25 @@ public class ClientHandler {
         }
     }
 
-    public void writeToHistory () {
+    public void writeToHistory() {
         while (true) {
             System.out.println("Client, please enter the message!");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("Lesson_7/Local_History.txt", true))) {
                 String coolChat = consoleReader.readLine();
-                    // out.writeUTF(coolChat);
                 if (!coolChat.equals("-exit")) {
                     bw.newLine();
-                    bw.append(coolChat);//return;
+                    bw.append(coolChat);
+                    out.writeUTF(coolChat); // Отправляем сообщение на сервер
+                } else {
+                    out.writeUTF("-exit"); // Сообщаем серверу о выходе
+                    break;
                 }
-                else break;
             } catch (IOException e) {
-                throw new RuntimeException("SWW",e);
+                throw new RuntimeException("SWW", e);
             }
         }
     }
+
 
     public void showHistory() {
         try (BufferedReader br = new BufferedReader(new FileReader("Lesson_7/Local_History.txt"))) {

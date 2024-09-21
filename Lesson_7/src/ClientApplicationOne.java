@@ -16,6 +16,7 @@ public class ClientApplicationOne {
                 public void run() {
                     while (true) {
                         try {
+                            //out.writeUTF("-auth l1 p1 u1");
                             String message = in.readUTF();
                             System.out.println(message);
                             if (message.contains("Incorrect credentials")) {
@@ -30,7 +31,7 @@ public class ClientApplicationOne {
                 }
             }).start();
 
-            out.writeUTF("-exit");
+   //         out.writeUTF("-exit");
         } catch (IOException e) {
             e.printStackTrace();
         }
