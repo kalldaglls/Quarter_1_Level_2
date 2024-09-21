@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Random;
 
 public class Server {
     private DataInputStream in;//входящий поток!
@@ -26,7 +27,14 @@ public class Server {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            out.writeUTF("Hi, human!");
+            Random random = new Random();
+            ServerIntroductions[] values = ServerIntroductions.values();
+            ServerIntroductions value = ServerIntroductions.HI;
+            ServerIntroductions randomIntroduction = values[random.nextInt(values.length)];
+
+            value.compareTo(values[0]);
+
+            out.writeUTF(String.valueOf(randomIntroduction));
 
 //            System.out.println(socket.getKeepAlive());
 //            System.out.println(socket.isClosed());
