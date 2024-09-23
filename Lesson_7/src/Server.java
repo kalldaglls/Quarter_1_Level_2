@@ -28,7 +28,7 @@ public class Server {
         }
     }
 
-    private void listenClients(@org.jetbrains.annotations.NotNull ServerSocket serverSocket) throws IOException {
+    private void listenClients(ServerSocket serverSocket) throws IOException {
         while (true) {
             System.out.println("Server is looking for a client...");
                 Socket client = serverSocket.accept();
