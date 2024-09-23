@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -31,18 +32,34 @@ public class ClientHandler {
         return name;
     }
 
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        ClientHandler that = (ClientHandler) o;
+//        return Objects.equals(name, that.name) && Objects.equals(socket, that.socket) && Objects.equals(in, that.in) && Objects.equals(out, that.out) && Objects.equals(server, that.server) && Objects.equals(consoleReader, that.consoleReader);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(name, socket, in, out, server, consoleReader);
+//    }
+
     public void start() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     authenticate();
-                    showHistory();
-                    writeToHistory();
-                    readMessage();
+                    if (name != null) { // Проверяем, прошел ли клиент аутентификацию
+                        //readMessage();
+                        //showHistory();
+                        writeToHistory();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
+                }
+                finally {
                     try {
                         closeConnection();
                     } catch (IOException e) {
@@ -53,48 +70,46 @@ public class ClientHandler {
         }).start();
     }
 
-    public void authenticate()  {
-        System.out.println("Client auth is on going...");
-        Thread firstThread = new Thread(new Runnable() {
+    public void authenticate() throws IOException {
+        System.out.println("Client auth is ongoing...");
+        sendMessage(this + ", please sign in!");
+        final boolean[] isAuthenticated = {false}; // Флаг для отслеживания статуса аутентификации
 
-            @Override
-            public void run() {
-                String loginInfo;
-                try {
-                    loginInfo = in.readUTF();
-                    checkAuth(loginInfo);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        Thread secondThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(120000);
-                    // if (in.readUTF().isBlank()) {
+        Thread secondThread = new Thread(() -> {
+            try {
+                Thread.sleep(50000); // Тайм-аут 50 секунд
+                if (!isAuthenticated[0]) {
                     closeConnection();
                     socket.close();
-                    //}
                     System.out.println("Client couldn't authorize in time!");
-                } catch (InterruptedException | IOException e) {
-                    e.printStackTrace();
                 }
-
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
             }
         });
+
+        Thread firstThread = new Thread(() -> {
+            try {
+                String loginInfo = in.readUTF();
+                checkAuth(loginInfo);
+                isAuthenticated[0] = true; // Установите флаг в true, если аутентификация успешна
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         firstThread.start();
         secondThread.start();
 
         try {
-            firstThread.join();
-            secondThread.join();
+            firstThread.join(); // Ждем завершения первого потока
+            secondThread.interrupt(); // Прерываем второй поток, если он еще работает
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
+
+
 
 
 
@@ -142,11 +157,12 @@ public class ClientHandler {
         }
     }
 
-    public void readMessage() throws IOException {
+    public void readMessage() throws IOException {//Читаем свои сообщения!
         while (true) {
             String message = in.readUTF();
             String formatterMessage = String.format("Message from %s: %s", name, message);
             System.out.println(formatterMessage);
+
             /*
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
                 bw.newLine();
@@ -155,25 +171,28 @@ public class ClientHandler {
 
                 throw new RuntimeException("SWW",e);
             }
+                 */
             if (message.equalsIgnoreCase("-exit")) {
+                sendMessage("You've successfully logged out!");
+                closeConnection();
                 return;
             }
-
-             */
 
             server.broadcast(formatterMessage);
         }
     }
 
-    public void writeToHistory() {
+    public void writeToHistory() throws IOException {
         while (true) {
-            System.out.println("Client, please enter the message!");
+            sendMessage("Client, please enter the message!");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("Lesson_7/Local_History.txt", true))) {
-                String coolChat = consoleReader.readLine();
+                String coolChat = in.readUTF();
                 if (!coolChat.equals("-exit")) {
                     bw.newLine();
                     bw.append(coolChat);
-                    out.writeUTF(coolChat); // Отправляем сообщение на сервер
+                    //out.writeUTF(coolChat); // Отправляем сообщение на сервер
+                    server.broadcast(coolChat);
+                    readMessage();
                 } else {
                     out.writeUTF("-exit"); // Сообщаем серверу о выходе
                     break;
@@ -188,17 +207,21 @@ public class ClientHandler {
     public void showHistory() {
         try (BufferedReader br = new BufferedReader(new FileReader("Lesson_7/Local_History.txt"))) {
             String str;
+            StringBuilder stringBuilder = new StringBuilder();
             int i = 1;
-            while ((str = br.readLine()) != null && i <= 100) {
+            while ((str = br.readLine()) != null && i <= 5) {
                 System.out.println(str);
+                stringBuilder.append(str).append("\n");
+                //server.broadcast(str);
                 i++;
             }
+            sendMessage(stringBuilder.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void sendMessage(String message) throws IOException {
+    public void sendMessage(String message) throws IOException {//Чтобы нам кто-то прислал сообщения!
             out.writeUTF(message);
             //System.out.println("Client, please enter the message!");
             //while (true) {
@@ -230,7 +253,7 @@ public class ClientHandler {
                     if (!server.checkLogin(maybeClient.getName())) {
                         System.out.println("We are in checkAuth 2");
                         sendMessage("status: authok");
-                        sendMessage("We've done it!!!");
+                        //sendMessage("We've done it!!!");
                         //showHistory();
                         name = maybeClient.getName();
                         System.out.println("We are in checkAuth 3");
