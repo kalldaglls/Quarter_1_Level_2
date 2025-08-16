@@ -1,8 +1,6 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,8 +37,21 @@ public class Server {
 
 
     public void broadcast(String incomingMessage) throws IOException {
-        for (ClientHandler ch : clientHandlers) {
-            ch.sendMessage(incomingMessage);
+        if (incomingMessage.contains("/w")) {
+            String[] splittedMessage = incomingMessage.split("\\s");
+            //AuthenticationService.Client maybeClient = this.getAuthenticationService()
+            AuthenticationService.Client maybeClient = this.getAuthenticationService()
+                    .findByLogin(
+                            splittedMessage[1]
+                    );
+            for (ClientHandler ch : clientHandlers) {
+                if (ch.getName().equals(maybeClient.getName())) {
+                    ch.sendMessage("Only you: " + incomingMessage);
+                }
+            }
+            for (ClientHandler ch : clientHandlers) {
+                ch.sendMessage(incomingMessage);
+            }
         }
     }
 

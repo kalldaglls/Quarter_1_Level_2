@@ -1,8 +1,8 @@
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents client session
@@ -13,14 +13,12 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private Server server;
-    private BufferedReader consoleReader;
 
     public ClientHandler(Socket socket, Server server) {
         this.socket = socket;
         try {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            this.consoleReader = new BufferedReader(new InputStreamReader(System.in));
             start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -32,19 +30,6 @@ public class ClientHandler {
         return name;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        ClientHandler that = (ClientHandler) o;
-//        return Objects.equals(name, that.name) && Objects.equals(socket, that.socket) && Objects.equals(in, that.in) && Objects.equals(out, that.out) && Objects.equals(server, that.server) && Objects.equals(consoleReader, that.consoleReader);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(name, socket, in, out, server, consoleReader);
-//    }
-
     public void start() {
         new Thread(new Runnable() {
             @Override
@@ -52,8 +37,7 @@ public class ClientHandler {
                 try {
                     authenticate();
                     if (name != null) { // Проверяем, прошел ли клиент аутентификацию
-                        //readMessage();
-                        //showHistory();
+                        showHistory();
                         writeToHistory();
                     }
                 } catch (IOException e) {
@@ -71,19 +55,23 @@ public class ClientHandler {
     }
 
     public void authenticate() throws IOException {
-        System.out.println("Client auth is ongoing...");
+        System.out.printf("Client %s auth is ongoing...", this);
         sendMessage(this + ", please sign in!");
         final boolean[] isAuthenticated = {false}; // Флаг для отслеживания статуса аутентификации
 
         Thread secondThread = new Thread(() -> {
             try {
-                Thread.sleep(50000); // Тайм-аут 50 секунд
-                if (!isAuthenticated[0]) {
+                for (int i = 0; i < 50 && !Thread.currentThread().isInterrupted(); i++) {
+                    Thread.sleep(1000); // Спим по 1 секунде 50 раз
+                }
+                if (!isAuthenticated[0] && !Thread.currentThread().isInterrupted()) {
                     closeConnection();
-                    socket.close();
                     System.out.println("Client couldn't authorize in time!");
                 }
-            } catch (InterruptedException | IOException e) {
+            } catch (InterruptedException e) {
+                // Нормальное завершение при прерывании
+                Thread.currentThread().interrupt();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
@@ -109,34 +97,6 @@ public class ClientHandler {
         }
     }
 
-
-
-
-
-        /*Thread firstThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-        Thread secondThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                checkAuth(loginInfo);
-            }
-        });
-
-         */
-
-
-
     public void closeConnection() throws IOException {
         server.unsubscribe(this);
         server.broadcast(String.format("%s left", name));
@@ -156,45 +116,45 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
-
+/*
     public void readMessage() throws IOException {//Читаем свои сообщения!
-        while (true) {
-            String message = in.readUTF();
-            String formatterMessage = String.format("Message from %s: %s", name, message);
-            System.out.println(formatterMessage);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        String message = in.readUTF();
+                        String formatterMessage = String.format("Message from %s: %s", name, message);
+                        System.out.println(formatterMessage);
 
-            /*
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
-                bw.newLine();
-                bw.append(formatterMessage);
-            } catch (IOException e) {
-
-                throw new RuntimeException("SWW",e);
+                        if (message.equalsIgnoreCase("-exit")) {
+                            sendMessage("You've successfully logged out!");
+                            closeConnection();
+                            return;
+                        }
+                        server.broadcast(formatterMessage);
+                    } catch (IOException e) {
+                       e.printStackTrace();
+                    }
+                }
             }
-                 */
-            if (message.equalsIgnoreCase("-exit")) {
-                sendMessage("You've successfully logged out!");
-                closeConnection();
-                return;
-            }
-
-            server.broadcast(formatterMessage);
-        }
+        }).start();
     }
-
+*/
     public void writeToHistory() throws IOException {
+        sendMessage(this.getName() + ", please enter the message!");
         while (true) {
-            sendMessage("Client, please enter the message!");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter("Lesson_7/Local_History.txt", true))) {
                 String coolChat = in.readUTF();
                 if (!coolChat.equals("-exit")) {
                     bw.newLine();
-                    bw.append(coolChat);
-                    //out.writeUTF(coolChat); // Отправляем сообщение на сервер
-                    server.broadcast(coolChat);
-                    readMessage();
-                } else {
-                    out.writeUTF("-exit"); // Сообщаем серверу о выходе
+                    bw.append(this.name).append(":").append(coolChat);
+                    String formatterMessage = String.format("Message from %s: %s", name, coolChat);
+                    server.broadcast(formatterMessage);
+                }
+                else {
+                    System.out.println("-exit"); // Сообщаем серверу о выходе
+                    closeConnection();
                     break;
                 }
             } catch (IOException e) {
@@ -203,19 +163,23 @@ public class ClientHandler {
         }
     }
 
-
     public void showHistory() {
         try (BufferedReader br = new BufferedReader(new FileReader("Lesson_7/Local_History.txt"))) {
             String str;
-            StringBuilder stringBuilder = new StringBuilder();
-            int i = 1;
-            while ((str = br.readLine()) != null && i <= 5) {
-                System.out.println(str);
-                stringBuilder.append(str).append("\n");
-                //server.broadcast(str);
-                i++;
+            List<String> history = new ArrayList<>();
+
+            while ((str = br.readLine()) != null) {
+                history.add(str);
             }
-            sendMessage(stringBuilder.toString());
+
+            int size = history.size();
+
+            List<String> lastFiveMessages =  history.subList(Math.max(0, size - 5), size);
+
+            for (String s : lastFiveMessages) {
+                sendMessage(s + "\n");
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -223,26 +187,12 @@ public class ClientHandler {
 
     public void sendMessage(String message) throws IOException {//Чтобы нам кто-то прислал сообщения!
             out.writeUTF(message);
-            //System.out.println("Client, please enter the message!");
-            //while (true) {
-        /*
-                String coolChat = consoleReader.readLine();
-                out.writeUTF(coolChat);
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\JAVA\\IdeaProjects\\Quarter_1_Level_2_\\Lesson_7\\Local_History.txt", true))) {
-                    bw.newLine();
-                    bw.append(coolChat);
-                } catch (IOException e) {
-
-                    throw new RuntimeException("SWW",e);
-                }
-         */
     }
 
     public void checkAuth (String loginInfo) throws IOException {
         while (true) {
             if (loginInfo.startsWith("-auth")) {
                 System.out.println("We are in checkAuth 1");
-                // -auth l1 p1
                 String[] splittedLoginInfo = loginInfo.split("\\s");
                 AuthenticationService.Client maybeClient = server.getAuthenticationService()
                         .findByLoginAndPassword(
@@ -253,8 +203,6 @@ public class ClientHandler {
                     if (!server.checkLogin(maybeClient.getName())) {
                         System.out.println("We are in checkAuth 2");
                         sendMessage("status: authok");
-                        //sendMessage("We've done it!!!");
-                        //showHistory();
                         name = maybeClient.getName();
                         System.out.println("We are in checkAuth 3");
                         server.broadcast(String.format("%s came in", name));
@@ -268,6 +216,7 @@ public class ClientHandler {
                     }
                 } else {
                     sendMessage("Incorrect credentials");
+                    return;
                 }
             }
         }

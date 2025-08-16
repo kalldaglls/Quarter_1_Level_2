@@ -1,8 +1,12 @@
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
 
 public class AuthenticationService {
     private Set<Client> clients;
+    private UserCredentials userCredentials;
 
     public AuthenticationService() {
         clients = Set.of(
@@ -19,6 +23,33 @@ public class AuthenticationService {
             }
         }
         return null;
+    }
+
+    public UserCredentials findByLoginAndPasswordSQL(String login, String password) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = ConnectionUtils.getConnection();
+            System.out.println(connection.getMetaData());
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        DatabaseService2 databaseService2 = new DatabaseService2();
+        userCredentials = databaseService2.findByLoginAndPassword(login, password);
+        return userCredentials;
+    }
+
+    public Client findByLogin(String login) {
+        for (Client c : clients) {
+            if (c.getLogin().equals(login)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public UserCredentials getUserCredentials() {
+        return userCredentials;
     }
 
     static public class Client {
